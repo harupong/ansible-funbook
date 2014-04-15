@@ -1,0 +1,113 @@
+#  Install Ruby
+#  https://gist.githubusercontent.com/owainlewis/7098068/
+## ===============================================
+- hosts: all
+  vars:
+      repo: https://github.com/miyagawa/ripdiko.git
+      target: ~/ripdiko
+
+  tasks:
+  - name: Install Ruby
+    apt: name={{item}} state=latest update_cache=yes
+    with_items:
+      - ruby2.0
+      - ruby2.0-dev
+
+  - name: apt install dependencies for ruby2.0
+    command: "sudo apt-get -y build-dep ruby2.0"
+
+  - name: remove ruby1.9.3
+    apt: name=ruby1.9.1 state=absent
+
+  - name: install required gems
+    gem: name={{item}} state=present user_install=no
+    with_items:
+      - bundler
+
+  - name: apt install dependencies for ripdiko and linode-cli
+    apt: name={{item}} state=latest update_cache=yes
+    with_items:
+      - git
+      - libxml2-dev
+      - libxslt1-dev
+      - rtmpdump
+      - ffmpeg
+      - swftools
+      - libavcodec-extra-53
+      - python-pycurl       #linode-cli
+
+  - name: add linode-cli apt repo
+    apt_repository: repo='deb http://apt.linode.com/ stable main' state=present update_cache=yes
+
+  - name: add linode-cli apt repo key
+    apt_key: url=https://apt.linode.com/linode.gpg state=present
+
+  - name: apt install linode-cli
+    apt: name={{item}} state=present update_cache=yes
+    with_items:
+      - linode-cli
+
+  - name: Clone ripdiko from github
+    git: repo={{repo}} dest={{ target }}
+
+  - name: Installing gem dependencies for ripdiko
+    command: "bundle install chdir={{target}}"
+
+  - name: Install Dropbox-uploader
+    copy: src=~/ansible-funbook/dropbox_uploader.sh dest=/root/dropbox_uploader.sh owner=root group=root mode=0754
+
+  - name: Copy Dropbox-uploader config file
+    copy: src=~/.dropbox_uploader dest=/root/.dropbox_uploader owner=root group=root mode=0644
+
+  - name: Set timezone variables
+    copy: content='Asia/Tokyo'
+          dest=/etc/timezone
+          owner=root
+          group=root
+          mode=0644
+          backup=yes
+
+  - name: update timezone
+    command: dpkg-reconfigure --frontend noninteractive tzdata
+
+  - name: restart cron service to reflect timezone change
+    service: name=cron state=restarted
+
+  - name: mkdir ripdiko/scripts
+    file: dest=/root/.ripdiko/scripts state=directory
+
+  - name: copy ripdiko script
+    copy: src=~/ansible-funbook/recording_finished dest=/root/.ripdiko/scripts/recording_finished owner=root group=root  mode=0777
+
+  - name: mkdir linodecli
+    file: dest=/root/.linodecli state=directory
+
+  - name: copy linode-cli config
+    copy: src=~/.linodecli/config dest=/root/.linodecli/config owner=root group=root  mode=0700
+
+  - name: Creates cron entry for obtaining radiko authkey for recording JUNK/ANN
+    cron: name="Obtain authkey for {{item}}" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}}\""
+    with_items:
+      - TBS
+      - LFR
+
+  - name: Creates cron entry for ripdiko recording JUNK/ANN
+    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko {{item}}\""
+    with_items:
+      - TBS
+      - LFR
+
+#  - name: Creates cron entry for obtaining radiko authkey for recording JUNK
+#    cron: name="obtain authkey for recoring ANN" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko TBS\""
+#
+#  - name: Creates cron entry for ripdiko recording JUNK
+#    cron: name="record ANN" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko TBS\""
+#
+#  - name: Creates cron entry for obtaining radiko authkey for recording 99 ANN
+#    cron: name="obtain authkey for recoring ANN" hour="0" minute="50" weekday="5" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko LFR\""
+#
+#  - name: Creates cron entry for ripdiko recording 99 ANN
+#    cron: name="record ANN" hour="1" minute="0" weekday="5" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko LFR\""
+
+  - name: Creates cron entry for ripdiko recording HOUSOU-DAIGAKU
+    cron: name="record housou-daigaku" hour="13-19/2" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko HOUSOU-DAIGAKU\""

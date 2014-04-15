@@ -1,0 +1,2 @@
+/bin/bash -l -c '/root/dropbox_uploader.sh -s upload `find /root/Music/Radiko/ -type f | sort -n | tail -1` /'
+/bin/bash -l -c 'linode delete ripdiko'

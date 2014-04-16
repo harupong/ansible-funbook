@@ -1,19 +1,28 @@
 #!/bin/bash
 
-UPLOADING_JOBS=`ps -ef |grep "dropbox_uploader.sh" |grep -v grep|wc -l`
+function count_jobs() {
+  i=`ps -ef |grep "recording_finished" |grep -v grep|wc -l`
+  echo $i
+}
 
-if [ $UPLOADING_JOBS -eq 0 ]; then
-  echo "UPLOADING_JOBS is $UPLOADING_JOBS. Start uploading"
-  /bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/*.mp3  /'
-  break
-fi
+UPLOADING_JOBS=`count_jobs`
 
 while [ $UPLOADING_JOBS -ne 0 ]
 do
-  echo "UPLOADING_JOBS is $UPLOADING_JOBS. Wait if it is not 0."
-  sleep 10
-  UPLOADING_JOBS=`ps -ef |grep "dropbox_uploader.sh" |grep -v grep|wc -l`
+  case $UPLOADING_JOBS in
+    1) echo "UPLOADING_JOBS is $UPLOADING_JOBS. Wait till other jobs complete."
+       sleep 10
+       UPLOADING_JOBS=`count_jobs`
+       ;;
+    *) echo "UPLOADING_JOBS is $UPLOADING_JOBS. Many jobs in queue, aborting."
+       exit 0
+       ;;
+  esac
 done
 
+echo "Start uploading"
+sleep 30
+#/bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/*.mp3  /'
+
 echo "Deleting linode"
-/bin/bash -l -c 'linode delete ripdiko'
+#/bin/bash -l -c 'linode delete ripdiko'

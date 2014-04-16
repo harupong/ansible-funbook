@@ -69,7 +69,7 @@ do
 
   if [ $i -eq 10 ]; then
     echo "`date`:tried relaunching 10 times and still failing. abort the process"
-    break
+    exit 1
   fi
 done
 

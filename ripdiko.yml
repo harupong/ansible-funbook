@@ -96,18 +96,3 @@
     with_items:
       - TBS
       - LFR
-
-#  - name: Creates cron entry for obtaining radiko authkey for recording JUNK
-#    cron: name="obtain authkey for recoring ANN" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko TBS\""
-#
-#  - name: Creates cron entry for ripdiko recording JUNK
-#    cron: name="record ANN" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko TBS\""
-#
-#  - name: Creates cron entry for obtaining radiko authkey for recording 99 ANN
-#    cron: name="obtain authkey for recoring ANN" hour="0" minute="50" weekday="5" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko LFR\""
-#
-#  - name: Creates cron entry for ripdiko recording 99 ANN
-#    cron: name="record ANN" hour="1" minute="0" weekday="5" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko LFR\""
-
-  - name: Creates cron entry for ripdiko recording HOUSOU-DAIGAKU
-    cron: name="record housou-daigaku" hour="13-19/2" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko HOUSOU-DAIGAKU\""

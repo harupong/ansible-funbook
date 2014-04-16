@@ -25,7 +25,7 @@ function initiate_linode() {
   cat ~/.ansible.inventory
 
   echo "`date`:run ansible-playbook(takes a while...)"
-  ansible-playbook -i ~/.ansible.inventory ~/ansible-funbook/ripdiko.yml
+  ansible-playbook -vvvv -i ~/.ansible.inventory ~/ansible-funbook/ripdiko.yml
 }
 
 function check_ansible_results() {

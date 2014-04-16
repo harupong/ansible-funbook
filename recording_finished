@@ -1,2 +1,19 @@
-/bin/bash -l -c '/root/dropbox_uploader.sh -s upload `find /root/Music/Radiko/ -type f | sort -n | tail -1` /'
+#!/bin/bash
+
+UPLOADING_JOBS=`ps -ef |grep "dropbox_uploader.sh" |grep -v grep|wc -l`
+
+if [ $UPLOADING_JOBS -eq 0 ]; then
+  echo "UPLOADING_JOBS is $UPLOADING_JOBS. Start uploading"
+  /bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/*.mp3  /'
+  break
+fi
+
+while [ $UPLOADING_JOBS -ne 0 ]
+do
+  echo "UPLOADING_JOBS is $UPLOADING_JOBS. Wait if it is not 0."
+  sleep 10
+  UPLOADING_JOBS=`ps -ef |grep "dropbox_uploader.sh" |grep -v grep|wc -l`
+done
+
+echo "Deleting linode"
 /bin/bash -l -c 'linode delete ripdiko'

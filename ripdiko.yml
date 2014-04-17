@@ -31,7 +31,6 @@
       - libxml2-dev
       - libxslt1-dev
       - rtmpdump
-      - ffmpeg
       - swftools
       - libavcodec-extra-53
       - python-pycurl       #linode-cli
@@ -52,6 +51,10 @@
 
   - name: Installing gem dependencies for ripdiko
     command: "bundle install chdir={{target}}"
+
+    # ~/bin/ffmpeg was downloaded from http://ffmpeg.gusari.org/static/
+  - name: Install ffmpeg
+    copy: src=~/bin/ffmpeg dest=/usr/bin/ffmpeg owner=root group=root mode=0754
 
   - name: Install Dropbox-uploader
     copy: src=~/ansible-funbook/dropbox_uploader.sh dest=/root/dropbox_uploader.sh owner=root group=root mode=0754

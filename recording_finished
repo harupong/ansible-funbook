@@ -1,20 +1,13 @@
 #!/bin/bash
 
-if [ -f my.lock ]; then
-  date >> my.lock
-else
-  touch my.lock
-  date >> my.lock
-fi
-
 echo "Transfering files to Dropbox"
 /bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/* /'
-sed -i '$ d' my.lock #remove one date entry(last line in my.lock)
+sed -i '$ d' /root/my.lock #remove last line, meaning "unlocking"
 echo "Transfering files DONE"
 
-linecount=`wc -l < my.lock`
+linecount=`wc -l < /root/my.lock`
 if [ $linecount -eq 0 ]; then
   echo "Running RIPDIKO_JOB is $linecount. Deleting linode."
-  rm my.lock
+  rm /root/my.lock
   /bin/bash -l -c 'linode delete ripdiko'
 fi

@@ -82,6 +82,9 @@
   - name: copy ripdiko script
     copy: src=~/ansible-funbook/recording_finished dest=/root/.ripdiko/scripts/recording_finished owner=root group=root  mode=0777
 
+  - name: Copy start_recording.sh
+    copy: src=~/ansible-funbook/start_recording.sh dest=/root/start_recording.sh owner=root group=root  mode=0777
+
   - name: mkdir linodecli
     file: dest=/root/.linodecli state=directory
 
@@ -95,7 +98,7 @@
       - LFR
 
   - name: Creates cron entry for ripdiko recording JUNK/ANN
-    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko {{item}} >> /root/ripdiko_{{item}}.log 2>&1\""
+    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"/root/start_recording.sh {{item}}\""
     with_items:
       - TBS
       - LFR

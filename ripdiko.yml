@@ -1,9 +1,9 @@
-#  Install Ruby
+#  install ruby
 #  https://gist.githubusercontent.com/owainlewis/7098068/
 ## ===============================================
 - hosts: all
   vars:
-      repo: https://github.com/miyagawa/ripdiko.git
+      repo: https://github.com/harupong/ripdiko.git
       target: ~/ripdiko
 
   tasks:

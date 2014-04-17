@@ -86,13 +86,13 @@
     copy: src=~/.linodecli/config dest=/root/.linodecli/config owner=root group=root  mode=0700
 
   - name: Creates cron entry for obtaining radiko authkey for recording JUNK/ANN
-    cron: name="Obtain authkey for {{item}}" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}}\""
+    cron: name="Obtain authkey for {{item}}" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}} >> /root/ripdiko_{{item}}.log 2>&1\""
     with_items:
       - TBS
       - LFR
 
   - name: Creates cron entry for ripdiko recording JUNK/ANN
-    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko {{item}}\""
+    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"cd /root/ripdiko && ruby bin/ripdiko {{item}} >> /root/ripdiko_{{item}}.log 2>&1\""
     with_items:
       - TBS
       - LFR

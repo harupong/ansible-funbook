@@ -5,7 +5,7 @@ UPLOADING_JOBS=`ps -ef |grep "dropbox_uploader.sh" |grep -v grep|wc -l`
 if [ $UPLOADING_JOBS -eq 0 ]; then
   echo "UPLOADING_JOBS is $UPLOADING_JOBS. Start uploading"
   /bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/*.mp3  /'
-  break
+  exit 0
 fi
 
 while [ $UPLOADING_JOBS -ne 0 ]

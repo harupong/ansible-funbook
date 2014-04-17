@@ -67,8 +67,8 @@ do
   check_ansible_results
   i=`expr $i + 1`
 
-  if [ $i -eq 10 ]; then
-    echo "`date`:tried relaunching 10 times and still failing. abort the process"
+  if [ $i -eq 5 ]; then
+    echo "`date`:tried relaunching 5 times and still failing. abort the process"
     exit 1
   fi
 done

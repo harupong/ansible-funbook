@@ -1,68 +1,20 @@
 #!/bin/bash
-# ロックファイルの行数でパラで走ってるジョブ数を把握して処理を制御したい
 
-function write_lockfile() {
-  if [ `cat ~/.ripdiko.lock | wc -l` -ge 1 ]; then
-    date >> ~/.ripdiko.lock
-  else
-    touch ~/.ripdiko.lock
-    date >> ~/.ripdiko.lock
-  fi
-}
-
-function remove_lockfile() {
-  if [ `cat ~/.ripdiko.lock | wc -l` -ge 2 ]; then
-    sed -e "1d" ~/.ripdiko.lock
-  else
-    rm ~/.ripdiko.lock
-  fi
-}
-
-function linecount_lockfile() {
-  count=`cat ~/.ripdiko.lock | wc -l`
-  echo $count
-}
-
-if [ -f ~/.ripdiko.lock ]; then # locked
-
-  i=`linecount_lockfile`
-  while [ $i -ge 2 ]
-  do
-    case $i in
-      2) echo "$i jobs already running. Wait till it completes."
-         sleep 10
-         i=`linecount_lockfile`
-         ;;
-      *) echo "$i jobs already running. aborting...."
-         exit 1
-         ;;
-    esac
-  done
-else                            # not locked
-  write_lockfile
-
-  remove_lockfile
+if [ -f my.lock ]; then
+  date >> my.lock
+else
+  touch my.lock
+  date >> my.lock
 fi
 
-while [ $UPLOADING_JOBS -ne 0 ]
-do
-  case $UPLOADING_JOBS in
-    1) echo "UPLOADING_JOBS is $UPLOADING_JOBS. Wait till other jobs complete."
-       sleep 10
-       UPLOADING_JOBS=`count_jobs`
-       ;;
-    *) echo "UPLOADING_JOBS is $UPLOADING_JOBS. Many jobs in queue, aborting."
-       exit 0
-       ;;
-  esac
-done
+echo "Transfering files to Dropbox"
+/bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/* /'
+sed -i '$ d' my.lock #remove one date entry(last line in my.lock)
+echo "Transfering files DONE"
 
-echo "Start uploading"
-sleep 30
-#/bin/bash -l -c '/root/dropbox_uploader.sh upload /root/Music/Radiko/*.mp3  /'
-
-UPLOADING_JOBS=`count_jobs`
-if [ $UPLOADING_JOBS -eq 0 ]; then
-  echo "Deleting linode"
-  #/bin/bash -l -c 'linode delete ripdiko'
+linecount=`wc -l < my.lock`
+if [ $linecount -eq 0 ]; then
+  echo "Running RIPDIKO_JOB is $linecount. Deleting linode."
+  rm my.lock
+  /bin/bash -l -c 'linode delete ripdiko'
 fi

@@ -76,7 +76,10 @@
   - name: restart cron service to reflect timezone change
     service: name=cron state=restarted
 
-  - name: Copy start_recording.sh
+  - name: Copy recording_setupper.sh
+    copy: src=~/ansible-funbook/recording_setupper.sh dest=/root/recording_setupper.sh owner=root group=root  mode=0777
+
+  - name: Copy recording_controller.sh
     copy: src=~/ansible-funbook/recording_controller.sh dest=/root/recording_controller.sh owner=root group=root  mode=0777
 
   - name: mkdir linodecli
@@ -86,12 +89,7 @@
     copy: src=~/.linodecli/config dest=/root/.linodecli/config owner=root group=root  mode=0700
 
   - name: Creates at entry for obtaining radiko authkey for recording JUNK/ANN
-    command: "at 00:50 cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}}"
-    with_items:
-      - TBS
-      - LFR
+    command: "at 00:50AM -f /root/recording_setupper.sh TBS LFR"
 
   - name: Creates at entry for ripdiko recording JUNK/ANN
-    command: "at 01:00 -f /root/recording_controller.sh {{item}}"
-    with_items:
-      - TBS LFR
+    command: "at 01:00AM -f /root/recording_controller.sh TBS LFR"

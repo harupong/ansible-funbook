@@ -9,16 +9,22 @@ function initiate_linode() {
 
   echo "`date`:linode-cli create"
   linode create ripdiko --password $LINODE_PASSWORD
+  linode_create_exit=$?
 
   echo "`date`:wait till linode gets running. linode status is:"
   status=""
 
-  while [ "$status" != "running" ]
-  do
-    sleep 20
-    status=`linode list --json | jq -r '.ripdiko.status'`
-    echo $status
-  done
+  if [ $linode_create_exit -ne 0 ]; then
+    echo "`date`:Something is wrong with Linde. abort initiate_linode()"
+    exit 2
+  else
+    while [ "$status" != "running" ]
+    do
+      sleep 20
+      status=`linode list --json | jq -r '.ripdiko.status'`
+      echo $status
+    done
+  fi
 
   echo "`date`:obtaining IP Address of linode"
   linode list --json | jq -r '.ripdiko.ips[0]' > ~/.ansible.inventory

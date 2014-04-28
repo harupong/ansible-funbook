@@ -88,8 +88,13 @@
   - name: copy linode-cli config
     copy: src=~/.linodecli/config dest=/root/.linodecli/config owner=root group=root  mode=0700
 
-  - name: Creates at entry for obtaining radiko authkey for recording JUNK/ANN
-    command: "at 00:50AM -f /root/recording_setupper.sh TBS LFR"
+  - name: Creates cron entry for obtaining radiko authkey for recording JUNK/ANN
+    cron: name="Obtain authkey" hour="0" minute="50" job="/bin/bash -l -c \"/root/recording_setupper.sh {{item}}\""
+    with_items:
+      - "TBS LFR"
 
-  - name: Creates at entry for ripdiko recording JUNK/ANN
-    command: "at 01:00AM -f /root/recording_controller.sh TBS LFR"
+  - name: Creates cron entry for ripdiko recording JUNK/ANN
+    cron: name="Record" hour="1" minute="0" job="/bin/bash -l -c \"/root/recording_controller.sh {{item}}\""
+    with_items:
+      - "TBS LFR"
+

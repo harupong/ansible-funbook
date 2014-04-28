@@ -76,14 +76,8 @@
   - name: restart cron service to reflect timezone change
     service: name=cron state=restarted
 
-  - name: mkdir ripdiko/scripts
-    file: dest=/root/.ripdiko/scripts state=directory
-
-  - name: copy ripdiko script
-    copy: src=~/ansible-funbook/recording_finished dest=/root/.ripdiko/scripts/recording_finished owner=root group=root  mode=0777
-
   - name: Copy start_recording.sh
-    copy: src=~/ansible-funbook/start_recording.sh dest=/root/start_recording.sh owner=root group=root  mode=0777
+    copy: src=~/ansible-funbook/recording_controller.sh dest=/root/recording_controller.sh owner=root group=root  mode=0777
 
   - name: mkdir linodecli
     file: dest=/root/.linodecli state=directory
@@ -91,14 +85,13 @@
   - name: copy linode-cli config
     copy: src=~/.linodecli/config dest=/root/.linodecli/config owner=root group=root  mode=0700
 
-  - name: Creates cron entry for obtaining radiko authkey for recording JUNK/ANN
-    cron: name="Obtain authkey for {{item}}" hour="0" minute="50" job="/bin/bash -l -c \"cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}} >> /root/ripdiko_{{item}}.log 2>&1\""
+  - name: Creates at entry for obtaining radiko authkey for recording JUNK/ANN
+    command: "at 00:50 cd /root/ripdiko && RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko {{item}}"
     with_items:
       - TBS
       - LFR
 
-  - name: Creates cron entry for ripdiko recording JUNK/ANN
-    cron: name="Record {{item}}" hour="1" minute="0" job="/bin/bash -l -c \"/root/start_recording.sh {{item}}\""
+  - name: Creates at entry for ripdiko recording JUNK/ANN
+    command: "at 01:00 -f /root/recording_controller.sh {{item}}"
     with_items:
-      - TBS
-      - LFR
+      - TBS LFR

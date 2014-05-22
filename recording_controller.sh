@@ -12,12 +12,20 @@ do
   ruby bin/ripdiko $station >> /root/Music/Radiko/ripdiko_$station.log 2>&1 &
 done
 
-# wait till recording is done
-recording_jobs=$(jobs|wc -l)
+# Using tmp files to find out when recording gets done
+recording_jobs=$(ls /tmp/*.mp3|wc -l)
+
+# first, wait till tmp file gets created
+while [ $recording_jobs -eq 0 ]
+do
+  sleep 60
+  recording_jobs=$(ls /tmp/*.mp3|wc -l)
+done
+# then, wait till tmp file gets deleted
 while [ $recording_jobs -ne 0 ]
 do
   sleep 60
-  recording_jobs=$(jobs|wc -l)
+  recording_jobs=$(ls /tmp/*.mp3|wc -l)
 done
 
 # File transfer

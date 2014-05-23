@@ -10,7 +10,7 @@ do
   station=${argv[$i-1]}
   echo $station
   cd /root/ripdiko
-  RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/tmp/ ruby bin/ripdiko $station &
+  RIPDIKO_SCRIPTS=/tmp/ RIPDIKO_OUTDIR=/root/Music/ ruby bin/ripdiko $station &
 done
 
 # wait till recording is done

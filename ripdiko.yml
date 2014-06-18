@@ -7,17 +7,8 @@
       target: ~/ripdiko
 
   tasks:
-  - name: Install Ruby
-    apt: name={{item}} state=latest update_cache=yes
-    with_items:
-      - ruby2.0
-      - ruby2.0-dev
-
   - name: apt install dependencies for ruby2.0
-    command: "sudo apt-get -y build-dep ruby2.0"
-
-  - name: remove ruby1.9.3
-    apt: name=ruby1.9.1 state=absent
+    command: "apt-get -y build-dep ruby2.0"
 
   - name: install required gems
     gem: name={{item}} state=present user_install=no
@@ -32,7 +23,7 @@
       - libxslt1-dev
       - rtmpdump
       - swftools
-      - libavcodec-extra-53
+      - libav-tools
       - python-pycurl       #linode-cli
 
   - name: add linode-cli apt repo

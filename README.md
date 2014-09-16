@@ -45,7 +45,8 @@ Ansible のコントロールマシン(制御する側)に必要なソフトウ�
 Linode のインスタンスをセットアップするのに使う。インストール手順 -> http://docs.ansible.com/intro_installation.html#id11
 
 ```
-$ sudo apt-add-repository ppa:rquillo/ansible
+$ sudo apt-get install software-properties-common
+$ sudo apt-add-repository ppa:ansible/ansible
 $ sudo apt-get update
 $ sudo apt-get install ansible
 ```
@@ -89,10 +90,11 @@ ssh-keygen -N "" -f ~/.ssh/id_rsa.linode
 
 #### Ansible の設定
 
-作業フォルダにある設定ファイル `.ansible.cfg` をホームディレクトリにコピーする。
+作業フォルダにある設定ファイル `.ansible.cfg` にホームディレクトリからシンボリックリンクを張る。
 
 ```
-cp -s .ansible.cfg ~/.ansible.cfg
+cd ~/
+ln -s /path/to/.ansible.cfg .ansible.cfg
 ```
 
 <!--
@@ -100,9 +102,9 @@ cp -s .ansible.cfg ~/.ansible.cfg
 
 ```
 host_key_checking = False
-log_path = ~/ansible-funbook/ansible.log
-ssh_user = root
-ssh_private_key_file = ~/.ssh/id_rsa.linode
+log_path = /path/to/ansible-funbook/ansible.log
+sudo_user = root
+private_key_file = ~/.ssh/id_rsa.linode
 ```
 -->
 
@@ -145,34 +147,9 @@ echo 'export LINODE_PASSWORD="<password>"' >> ~/.bash_profile
 
 ```
 ## Launch Linode instance for recording XYZ
-0 0 * * * /bin/bash -l -c '~/ansible-funbook/linode_ripdiko.sh > ~/ansible-funbook/linode_ripdiko.log 2>&1'
+0 0 * * * /bin/bash -l -c '/path/to/ansible-funbook/linode_ripdiko.sh > /path/to/ansible-funbook/linode_ripdiko.log 2>&1'
 ```
 
 #### ripdiko 用のAnsible-playbook
 #### ripdiko 用の recording_finished スクリプト
-
-### TODO
-#### linode-cli 用の apt-repo 追加で失敗する
-
-2014-04-13 17:30 くらいの ansible.log を確認してみよう
-
-
-#### `ansible-playbook` の GATHERING FACTS で SSH エラーが出た場合の検知と対応方法を探す
-
-```
-2014-04-13 00:31:21,448 p=2608 u=ubuntu |  PLAY [all] ********************************************************************
-2014-04-13 00:31:21,448 p=2608 u=ubuntu |  GATHERING FACTS ***************************************************************
-2014-04-13 00:31:24,518 p=2608 u=ubuntu |  fatal: [106.186.18.73] => SSH encountered an unknown error during the connection. We recommend you re-run the command using -vvvv, which will enable SSH debugging output to help diagnose the issue
-2014-04-13 00:31:24,519 p=2608 u=ubuntu |  TASK: [Install Ruby] **********************************************************
-2014-04-13 00:31:24,534 p=2608 u=ubuntu |  FATAL: no hosts matched or all hosts have already failed -- aborting
-
-2014-04-13 00:31:24,535 p=2608 u=ubuntu |  PLAY RECAP ********************************************************************
-2014-04-13 00:31:24,536 p=2608 u=ubuntu |             to retry, use: --limit @/home/ubuntu/ripdiko.retry
-
-2014-04-13 00:31:24,536 p=2608 u=ubuntu |  106.186.18.73              : ok=0    changed=0    unreachable=1    failed=0
-
-```
-
-grep のエラーコード使って検知し、./linode_ripdiko.sh を再実行するようにした。
-
 

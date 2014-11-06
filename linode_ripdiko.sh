@@ -15,8 +15,8 @@ function initiate_linode() {
   status=""
 
   if [ $linode_create_exit -ne 0 ]; then
-    echo "`date`:Something is wrong with Linde. abort initiate_linode()"
-    exit 2
+    echo "`date`:Something is wrong with Linode. Retrying from the start..."
+    break
   else
     while [ "$status" != "running" ]
     do
@@ -24,19 +24,19 @@ function initiate_linode() {
       status=`linode list --json | jq -r '.ripdiko.status'`
       echo $status
     done
+
+    echo "`date`:obtaining IP Address of linode"
+    linode list --json | jq -r '.ripdiko.ips[0]' > ~/.ansible.inventory
+    cat ~/.ansible.inventory
+  
+    echo "`date`:run ansible-playbook(takes a while...)"
+    ansible-playbook -vvvv -i ~/.ansible.inventory ~/Apps/ansible-funbook/ripdiko.yml
   fi
-
-  echo "`date`:obtaining IP Address of linode"
-  linode list --json | jq -r '.ripdiko.ips[0]' > ~/.ansible.inventory
-  cat ~/.ansible.inventory
-
-  echo "`date`:run ansible-playbook(takes a while...)"
-  ansible-playbook -vvvv -i ~/.ansible.inventory ~/ansible-funbook/ripdiko.yml
 }
 
 function check_ansible_results() {
 echo "`date`:check if ansible-playbook went well"
-tail ~/ansible-funbook/linode_ripdiko.log |grep unreachable=0 |grep failed=0 #grep returns exit code 1 if ansible error
+tail ~/Apps/ansible-funbook/linode_ripdiko.log |grep unreachable=0 |grep failed=0 #grep returns exit code 1 if ansible error
 ansible_result=$?
 
 if [ $ansible_result -ne 0 ]; then

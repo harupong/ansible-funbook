@@ -145,7 +145,7 @@ echo 'export LINODE_PASSWORD="<password>"' >> ~/.bash_profile
 
 ```
 ## Launch Linode instance for recording XYZ
-0 0 * * * /bin/bash -l -c '~/ansible-funbook/linode_ripdiko.sh > ~/ansible-funbook/linode_ripdiko.log 2>&1'
+30 0 * * 2,3,4,5,6 /bin/bash -l -c '~/Apps/ansible-funbook/linode_ripdiko.sh > ~/Apps/ansible-funbook/linode_ripdiko.log 2>&1'
 ```
 
 #### ripdiko 用のAnsible-playbook

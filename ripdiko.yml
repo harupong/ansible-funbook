@@ -7,6 +7,9 @@
       target: ~/ripdiko
 
   tasks:
+  - name: apt update
+    command: "apt-get update"
+
   - name: apt install dependencies for ruby2.0
     command: "apt-get -y build-dep ruby2.0"
 
@@ -24,6 +27,7 @@
       - rtmpdump
       - swftools
       - libav-tools
+      - language-pack-ja    #JAlocale
       - python-pycurl       #linode-cli
 
   - name: add linode-cli apt repo
@@ -45,10 +49,10 @@
 
     # ~/bin/ffmpeg was downloaded from http://ffmpeg.gusari.org/static/
   - name: Install ffmpeg
-    copy: src=~/bin/ffmpeg dest=/usr/bin/ffmpeg owner=root group=root mode=0754
+    copy: src=~/bin/ffmpeg.old dest=/usr/bin/ffmpeg owner=root group=root mode=0754
 
   - name: Install Dropbox-uploader
-    copy: src=~/ansible-funbook/dropbox_uploader.sh dest=/root/dropbox_uploader.sh owner=root group=root mode=0754
+    copy: src=~/Apps/ansible-funbook/dropbox_uploader.sh dest=/root/dropbox_uploader.sh owner=root group=root mode=0754
 
   - name: Copy Dropbox-uploader config file
     copy: src=~/.dropbox_uploader dest=/root/.dropbox_uploader owner=root group=root mode=0644
@@ -68,10 +72,10 @@
     service: name=cron state=restarted
 
   - name: Copy recording_setupper.sh
-    copy: src=~/ansible-funbook/recording_setupper.sh dest=/root/recording_setupper.sh owner=root group=root  mode=0777
+    copy: src=~/Apps/ansible-funbook/recording_setupper.sh dest=/root/recording_setupper.sh owner=root group=root  mode=0777
 
   - name: Copy recording_controller.sh
-    copy: src=~/ansible-funbook/recording_controller.sh dest=/root/recording_controller.sh owner=root group=root  mode=0777
+    copy: src=~/Apps/ansible-funbook/recording_controller.sh dest=/root/recording_controller.sh owner=root group=root  mode=0777
 
   - name: mkdir linodecli
     file: dest=/root/.linodecli state=directory
